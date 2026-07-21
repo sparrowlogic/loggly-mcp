@@ -210,11 +210,10 @@
             </plugin>
 
             <!--
-              Enforces a line-coverage floor on `mvn verify`. Set at 60% — at-or-below the
-              measured baseline when this was added, so it passes today and ratchets up as
-              coverage improves rather than being an aspirational number that blocks the build.
-              LogglyMcpApplication is excluded since its `main` method is trivial bootstrap code
-              that @SpringBootTest doesn't execute (it wires the context directly, not via main()).
+              Enforces >=85% line coverage on `mvn verify`, excluding configuration classes:
+              the main @SpringBootApplication bootstrap class (whose main() isn't exercised by
+              @SpringBootTest, which wires the context directly) and @Configuration/@ConfigurationProperties
+              classes (thin wiring with no meaningful branching to test).
             -->
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -223,6 +222,10 @@
                 <configuration>
                     <excludes>
                         <exclude>**/LogglyMcpApplication.class</exclude>
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/*Config.class</exclude>
+                        <exclude>**/*Configuration.class</exclude>
+                        <exclude>**/*Properties.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -253,7 +256,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.60</minimum>
+                                            <minimum>0.85</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
