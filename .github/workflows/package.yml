@@ -43,10 +43,11 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Resolved build version: $VERSION"
 
-      - name: Build fat jar
+      - name: Build, lint, and verify
+        # verify (not package) so checkstyle/spotless/NullAway gate the build, not just local runs.
         run: |
           chmod +x mvnw
-          ./mvnw -B --no-transfer-progress -Drevision=${{ steps.v.outputs.version }} clean package
+          ./mvnw -B --no-transfer-progress -Drevision=${{ steps.v.outputs.version }} clean verify
 
       # Reproduce `make jar`: prepend the shell launcher so the artifact is a
       # self-executing jar (runnable directly or via `java -jar`).

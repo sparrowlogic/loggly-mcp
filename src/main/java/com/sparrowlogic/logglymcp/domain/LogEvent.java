@@ -1,8 +1,7 @@
 package com.sparrowlogic.logglymcp.domain;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 import tools.jackson.databind.JsonNode;
 
 /**
@@ -20,12 +19,12 @@ import tools.jackson.databind.JsonNode;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record LogEvent(
-		String id,
-		long timestamp,
-		String logmsg,
-		String raw,
-		String unparsed,
-		List<String> logtypes,
-		List<String> tags,
-		JsonNode event) {
+        String id,
+        long timestamp,
+        String logmsg,
+        String raw,
+        String unparsed,
+        List<String> logtypes,
+        List<String> tags,
+        JsonNode event) {
 }

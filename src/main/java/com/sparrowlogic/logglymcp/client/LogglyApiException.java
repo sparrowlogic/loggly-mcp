@@ -6,15 +6,15 @@ package com.sparrowlogic.logglymcp.client;
  */
 public class LogglyApiException extends RuntimeException {
 
-	private final int status;
+    private final int status;
 
-	public LogglyApiException(int status, String body) {
-		super("Loggly API request failed with HTTP " + status
-				+ (body == null || body.isBlank() ? "" : ": " + body));
-		this.status = status;
-	}
+    public LogglyApiException(int status, String body) {
+        super("Loggly API request failed with HTTP " + status
+                + (body == null || body.isBlank() ? "" : ": " + body));
+        this.status = status;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public int getStatus() {
+        return this.status;
+    }
 }

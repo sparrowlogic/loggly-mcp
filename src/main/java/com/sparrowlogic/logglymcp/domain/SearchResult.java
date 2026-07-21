@@ -23,17 +23,17 @@ import java.util.List;
  * @param events       the compact events on this page
  */
 public record SearchResult(
-		String searchId,
-		int page,
-		int pageSize,
-		int returned,
-		int totalFetched,
-		boolean hasMore,
-		Integer nextPage,
-		boolean capped,
-		boolean cached,
-		boolean windowStable,
-		String fromResolved,
-		String untilResolved,
-		List<CompactEvent> events) {
+        String searchId,
+        int page,
+        int pageSize,
+        int returned,
+        int totalFetched,
+        boolean hasMore,
+        Integer nextPage,
+        boolean capped,
+        boolean cached,
+        boolean windowStable,
+        String fromResolved,
+        String untilResolved,
+        List<CompactEvent> events) {
 }

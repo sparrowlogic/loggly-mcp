@@ -1,8 +1,7 @@
 package com.sparrowlogic.logglymcp.domain;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 
 /**
  * One page of results from the Loggly paginating event-retrieval API
@@ -19,6 +18,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SearchPage(
-		List<LogEvent> events,
-		String next) {
+        List<LogEvent> events,
+        String next) {
 }

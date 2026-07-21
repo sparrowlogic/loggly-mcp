@@ -1,8 +1,7 @@
 package com.sparrowlogic.logglymcp.cache;
 
-import java.util.List;
-
 import com.sparrowlogic.logglymcp.domain.LogEvent;
+import java.util.List;
 
 /**
  * A cached snapshot of a log search: the full events fetched once from Loggly, plus the metadata
@@ -21,18 +20,18 @@ import com.sparrowlogic.logglymcp.domain.LogEvent;
  * @param expiresAtMillis when the snapshot should be evicted
  */
 public record CachedSearch(
-		String searchId,
-		String query,
-		String fromResolved,
-		String untilResolved,
-		String order,
-		List<LogEvent> events,
-		boolean capped,
-		boolean windowStable,
-		long createdAtMillis,
-		long expiresAtMillis) {
+        String searchId,
+        String query,
+        String fromResolved,
+        String untilResolved,
+        String order,
+        List<LogEvent> events,
+        boolean capped,
+        boolean windowStable,
+        long createdAtMillis,
+        long expiresAtMillis) {
 
-	boolean isExpired(long nowMillis) {
-		return nowMillis >= expiresAtMillis;
-	}
+    boolean isExpired(long nowMillis) {
+        return nowMillis >= this.expiresAtMillis;
+    }
 }

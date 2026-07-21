@@ -26,18 +26,18 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  */
 @ConfigurationProperties(prefix = "loggly")
 public record LogglyProperties(
-		String subdomain,
-		String apiToken,
-		@DefaultValue("1000") int maxFetch,
-		@DefaultValue("25") int defaultPageSize,
-		@DefaultValue("200") int maxPageSize,
-		@DefaultValue("500") int messageMaxChars,
-		@DefaultValue("5") int stableWindowMinutes,
-		@DefaultValue("30") int stableTtlMinutes,
-		@DefaultValue("2") int liveTtlMinutes) {
+        String subdomain,
+        String apiToken,
+        @DefaultValue("1000") int maxFetch,
+        @DefaultValue("25") int defaultPageSize,
+        @DefaultValue("200") int maxPageSize,
+        @DefaultValue("500") int messageMaxChars,
+        @DefaultValue("5") int stableWindowMinutes,
+        @DefaultValue("30") int stableTtlMinutes,
+        @DefaultValue("2") int liveTtlMinutes) {
 
-	/** The API base URL for this account, e.g. {@code https://acme.loggly.com/apiv2}. */
-	public String baseUrl() {
-		return "https://" + subdomain + ".loggly.com/apiv2";
-	}
+    /** The API base URL for this account, e.g. {@code https://acme.loggly.com/apiv2}. */
+    public String baseUrl() {
+        return "https://" + this.subdomain + ".loggly.com/apiv2";
+    }
 }
