@@ -1,0 +1,70 @@
+name: Package JAR
+
+# Build the self-executing fat jar on every push to main, on version tags, and on
+# manual dispatch. Tag pushes (v*) additionally attach the jar to a GitHub Release.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write  # needed to create a Release on tag pushes
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Match the project's toolchain (java.version=26 in pom.xml). Corretto 26 mirrors
+      # the local build (Amazon Corretto). If the runner can't provision JDK 26 yet
+      # (it is early-access until GA), switch distribution/version here.
+      - name: Set up JDK 26
+        uses: actions/setup-java@v5
+        with:
+          distribution: corretto
+          java-version: '26'
+          cache: maven
+
+      - name: Resolve version
+        # Tag pushes: strip leading 'v' from refs/tags/vX.Y.Z -> X.Y.Z.
+        # Manual / branch builds: date + short SHA so the artifact is
+        # identifiable but obviously not a release.
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="0.0.0-$(date -u +%Y%m%d).${GITHUB_SHA::7}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved build version: $VERSION"
+
+      - name: Build fat jar
+        run: |
+          chmod +x mvnw
+          ./mvnw -B --no-transfer-progress -Drevision=${{ steps.v.outputs.version }} clean package
+
+      # Reproduce `make jar`: prepend the shell launcher so the artifact is a
+      # self-executing jar (runnable directly or via `java -jar`).
+      - name: Assemble self-executing jar
+        run: |
+          cat scripts/jar-prefix.sh target/loggly-mcp.jar > target/loggly-mcp-exec.jar
+          chmod +x target/loggly-mcp-exec.jar
+          ls -lh target/loggly-mcp-exec.jar
+
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: loggly-mcp-jar
+          path: target/loggly-mcp-exec.jar
+          if-no-files-found: error
+
+      - name: Attach jar to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: target/loggly-mcp-exec.jar

@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: loggly-mcp
+  # stdio MCP servers communicate over stdout/stdin using JSON-RPC, so the
+  # process must not start a web server and must not print a banner to stdout.
+  main:
+    banner-mode: "off"
+    web-application-type: none
+  ai:
+    mcp:
+      server:
+        enabled: true
+        # Expose this app as an MCP server over stdio. Enabling stdio turns off
+        # the SSE/streamable HTTP transports automatically.
+        stdio: true
+        type: sync
+        name: loggly-mcp
+        # Filled at build time from the project version via Spring Boot's @...@
+        # resource filtering (re-instated in pom.xml's <resources> block).
+        version: '@project.version@'
+        instructions: >-
+          Read-only access to Loggly logs. Log aggregation returns large result sets,
+          so search is fetch-once-then-paginate: search_logs(query, from, until) fetches
+          the matching events once, caches them, and returns a 'searchId' plus the first
+          page of COMPACT events (newest first). Page through with fetch_page(searchId,
+          page) and pull one event's full payload with get_event(searchId, id) — only
+          search_logs hits Loggly. If a result is 'capped', narrow the query/window. Use
+          list_fields to discover fields and field_values for a field's top values. Time
+          bounds accept relative spans (-24h, -7d), bare dates, ISO-8601 timestamps, or
+          'now'.
+        # annotation-scanner.enabled defaults to true, so @McpTool-annotated
+        # beans are discovered and registered automatically.
+
+loggly:
+  # Account subdomain — selects the host https://<subdomain>.loggly.com. Supplied at
+  # runtime via LOGGLY_SUBDOMAIN; "acme" is just a placeholder default.
+  subdomain: ${LOGGLY_SUBDOMAIN:acme}
+  # API token — supplied at runtime via the LOGGLY_API_TOKEN environment variable (or a
+  # gitignored application-local.yaml). This is a Loggly API token (Source Setup > API
+  # Tokens), NOT the ingestion/customer token. Never commit a real token.
+  api-token: ${LOGGLY_API_TOKEN:}
+  # Events pulled into one cached snapshot (one Loggly max page => usually a single API call).
+  max-fetch: 1000
+  # MCP page sizes — kept modest so a page of compact events stays under the response token
+  # ceiling. (1000 compact events would re-blow the limit, so max-page-size is NOT the fetch cap.)
+  default-page-size: 25
+  max-page-size: 200
+
+# stdio MCP transport: stdout is the JSON-RPC channel. logback-spring.xml routes the console
+# appender to stderr so a log line can never desync it regardless of level; these levels just
+# keep stderr quiet by default. To re-enable diagnostics, override at runtime, e.g.:
+#   LOGGING_LEVEL_ROOT=INFO LOGGING_LEVEL_COM_SPARROWLOGIC_LOGGLYMCP=DEBUG
+logging:
+  level:
+    root: ERROR
+    "com.sparrowlogic.logglymcp": WARN
+    "org.springframework.context.support.PostProcessorRegistrationDelegate": ERROR
+    "org.springframework.ai.mcp.annotation.provider.tool": ERROR

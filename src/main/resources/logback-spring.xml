@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Spring Boot's default console appender targets System.out. For a stdio MCP server that is
+  catastrophic: stdout is the JSON-RPC channel, so any log line — ours, Spring's, or the MCP SDK's
+  own logger.error(...) on a transport hiccup — interleaves with protocol frames and desyncs the
+  client's parser ("wrote non-JSON-RPC output to stdout ... transport closed"), even though
+  application.yaml's logging.level.* keeps volume low. Redirecting the console appender to
+  System.err (levels are still governed by logging.level.* in application.yaml) is what actually
+  keeps stdout protocol-only.
+-->
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+	<appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.err</target>
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDERR"/>
+	</root>
+</configuration>

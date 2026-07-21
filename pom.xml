@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.sparrowlogic</groupId>
+    <artifactId>loggly-mcp</artifactId>
+    <!--
+      Maven CI-Friendly Versions: the version is a ${revision} placeholder
+      injected at build time via -Drevision=. The release workflow extracts
+      the version from the pushed tag (vX.Y.Z -> X.Y.Z) and passes it through.
+      Local builds without the flag pick up the default below.
+    -->
+    <version>${revision}</version>
+    <name>loggly-mcp</name>
+    <description>loggly-mcp</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <java.version>26</java.version>
+        <spring-ai.version>2.0.0</spring-ai.version>
+        <!-- Default ${revision} for local builds. The release workflow overrides
+             this with the tag-derived version (e.g. -Drevision=1.0.0). -->
+        <revision>0.0.0-LOCAL-SNAPSHOT</revision>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-server</artifactId>
+        </dependency>
+
+        <!-- RestClient (Spring Framework 7) for the Loggly HTTP client. Pulled in
+             explicitly so we have it even though the stdio server runs with no web server. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <finalName>loggly-mcp</finalName>
+        <resources>
+            <!--
+              Spring Boot's parent POM normally adds a filtered resource block for
+              application.* with @...@ delimiters. Declaring our own <resources>
+              overrides that default, so we re-instate the filtered slice here.
+              Keeps @project.version@ flowing into application.yaml's server version.
+            -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application*.yaml</include>
+                    <include>application*.yml</include>
+                    <include>application*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>application*.yaml</exclude>
+                    <exclude>application*.yml</exclude>
+                    <exclude>application*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
