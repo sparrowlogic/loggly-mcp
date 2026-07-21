@@ -1,11 +1,12 @@
 # loggly-mcp — build / install / register workflows for the stdio MCP server.
 #
 # Targets:
-#   make jar         — build the self-executing fat jar (target/loggly-mcp-exec.jar)
-#   make install     — copy the executable jar into $(INSTALL_DIR)
-#   make register    — register the installed jar with Claude Code (user scope)
-#   make unregister  — remove the server from the Claude Code user config
-#   make ship        — jar + install + register, in one shot
+#   make jar                 — build the self-executing fat jar (target/loggly-mcp-exec.jar)
+#   make install              — copy the executable jar into $(INSTALL_DIR)
+#   make register             — register the installed jar with Claude Code (user scope)
+#   make unregister           — remove the server from the Claude Code user config
+#   make ship                 — jar + install + register, in one shot
+#   make update-dependencies  — bump dependency versions to latest, report plugin updates
 
 # Load local secrets (LOGGLY_API_TOKEN=..., LOGGLY_SUBDOMAIN=...) from .env if present,
 # and export them so they reach the `claude mcp add` invocation in the register target.
@@ -66,3 +67,7 @@ unregister: ## remove the server from the Claude Code user config
 
 .PHONY: ship
 ship: jar install register ## jar + install + register, in one shot
+
+.PHONY: update-dependencies
+update-dependencies: ## bump dependency versions to latest, report plugin updates
+	./mvnw wrapper:wrapper && ./mvnw -U versions:use-latest-versions && ./mvnw versions:display-plugin-updates
